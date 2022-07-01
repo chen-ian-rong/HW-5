@@ -1,42 +1,22 @@
-`timescale 1ns/1ps
-module RTL_tb;
-    reg clk;
-    reg rst_asyn;
-	  wire  [3:0] Q_out;
-    parameter OFFSET = 0;
+module LFSR(clk, set, Q);
+input clk; //I clock in
+input set; //I set
+output [3:1] Q; // O Result
+reg [3:1] Q;
 
-// clock process
-initial
-begin
-    #OFFSET;
-    forever
-    begin
-        clk = 1'b0;
-        #2 clk = 1'b1;
-        #2;
+always@ (posedge clk)
+ begin
+  if (set)begin  //set值輸出6
+        Q[3]<=1;
+        Q[2]<=1;
+        Q[1]<=0;
     end
-end
-
-// reset process
-initial
-begin
-    #OFFSET;
-    forever
-    begin
-        rst_asyn = 1'b1;
-        #5   rst_asyn = 1'b0;
-        #50;
+    else begin    //LFS
+        Q[3]<=Q[2]; //Q2給Q3
+        Q[2]<=Q[1]; //O1給Q2
+        Q[1]<=Q[1]^Q[3]; //Q1和Q3做互斥或給Q1
     end
-end
-
-// clock & reset finish
-initial begin
-        #60 $finish;
-end
-
-initial begin
-	$dumpfile("RTL.vcd");
-	$dumpvars(0, RTL_tb);
-end
-BCD RTL_tb(.clk, .rst_asyn, .Q_out);
+        
+   
+ end
 endmodule
